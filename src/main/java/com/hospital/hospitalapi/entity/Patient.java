@@ -1,25 +1,26 @@
-package com.hospital.hospitalapi.model;
+package com.hospital.hospitalapi.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(name = "patients")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
     private String email;
-    private String password;
-    private String role; // "ADMIN", "DOCTOR", "PATIENT"
     private String phone;
+    private int age;
     private String gender;
-
-    @Column(nullable = true)
     private String address;
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    private List<MedicalHistory> medicalHistory;
 }

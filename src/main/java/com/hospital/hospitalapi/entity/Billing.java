@@ -1,25 +1,23 @@
-package com.hospital.hospitalapi.model;
+package com.hospital.hospitalapi.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "medical_history")
+@Table(name = "billing")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MedicalHistory {
+public class Billing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String conditionName;
-    private String treatment;
-    private LocalDate dateRecorded;
+    private Double amount;
+    private String paymentStatus; // Pending, Paid, Failed
+    private LocalDate billingDate;
 
     @ManyToOne
-    @JoinColumn(name = "patient_id")
     private Patient patient;
 }
-

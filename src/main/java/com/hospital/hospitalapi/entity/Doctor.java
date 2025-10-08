@@ -1,4 +1,4 @@
-package com.hospital.hospitalapi.model;
+package com.hospital.hospitalapi.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

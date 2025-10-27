@@ -17,5 +17,7 @@ public class DoctorResponse {
     private Integer experienceYears;
     private Double consultationFee;
     private Boolean isAvailable;
+    private Boolean isActive;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

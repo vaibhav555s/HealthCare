@@ -10,6 +10,7 @@ public class PatientResponse {
     private String firstName;
     private String lastName;
     private LocalDate dateOfBirth;
+    private Integer age;  // Add this field
     private String gender;
     private String contactNumber;
     private String email;

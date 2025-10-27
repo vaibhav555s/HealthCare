@@ -29,61 +29,70 @@ public class AIPrescriptionController {
     private final GeminiIntegrationRepositoryBean geminiIntegrationRepositoryBean;
     
     @PostMapping("/{prescriptionId}/upload-image")
-    @Operation(summary = "Upload prescription image for AI analysis")
-    public ResponseEntity<ApiResponse<PrescriptionAnalysisResponse>> uploadPrescriptionImage(
-            @PathVariable Long prescriptionId,
-            @RequestParam("file") MultipartFile file) {
-        
-        PrescriptionImage image = prescriptionAnalysisRepositoryBean.uploadPrescriptionImage(prescriptionId, file);
-        
-        PrescriptionAnalysisResponse response = new PrescriptionAnalysisResponse();
-        response.setImageId(image.getId());
-        response.setStatus(image.getAnalysisStatus());
-        
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ApiResponse.success("Prescription image uploaded. Analysis in progress.", response));
-    }
+@Operation(summary = "Upload prescription image for AI analysis")
+public ResponseEntity<ApiResponse<PrescriptionAnalysisResponse>> uploadPrescriptionImage(
+        @PathVariable Long prescriptionId,
+        @RequestParam("file") MultipartFile file) {
+    
+    PrescriptionImage image = prescriptionAnalysisRepositoryBean.uploadPrescriptionImage(prescriptionId, file);
+    
+    PrescriptionAnalysisResponse response = new PrescriptionAnalysisResponse();
+    response.setImageId(image.getId());
+    response.setStatus(image.getAnalysisStatus());
+    response.setExtractedText(image.getExtractedText());
+    response.setAnalyzedMedicines(image.getAnalyzedMedicines());
+    response.setConfidenceScore(image.getConfidenceScore());
+    response.setAnalyzedAt(image.getAnalyzedAt());
+    
+    String message = "COMPLETED".equals(image.getAnalysisStatus()) 
+        ? "Prescription analyzed successfully" 
+        : "Prescription uploaded but analysis failed";
+    
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(ApiResponse.success(message, response));
+}
     
     @GetMapping("/images/{imageId}")
-    @Operation(summary = "Get prescription image details")
-    public ResponseEntity<ApiResponse<PrescriptionAnalysisResponse>> getPrescriptionImage(@PathVariable Long imageId) {
-        PrescriptionImage image = prescriptionAnalysisRepositoryBean.getPrescriptionImageById(imageId);
-        
-        PrescriptionAnalysisResponse response = new PrescriptionAnalysisResponse();
-        response.setImageId(image.getId());
-        response.setStatus(image.getAnalysisStatus());
-        response.setExtractedText(image.getExtractedText());
-        response.setConfidenceScore(image.getConfidenceScore());
-        response.setAnalyzedAt(image.getAnalyzedAt());
-        
-        return ResponseEntity.ok(ApiResponse.success("Prescription image retrieved", response));
-    }
+@Operation(summary = "Get prescription image details")
+public ResponseEntity<ApiResponse<PrescriptionAnalysisResponse>> getPrescriptionImage(@PathVariable Long imageId) {
+    PrescriptionImage image = prescriptionAnalysisRepositoryBean.getPrescriptionImageById(imageId);
+    
+    PrescriptionAnalysisResponse response = new PrescriptionAnalysisResponse();
+    response.setImageId(image.getId());
+    response.setStatus(image.getAnalysisStatus());
+    response.setExtractedText(image.getExtractedText());
+    response.setAnalyzedMedicines(image.getAnalyzedMedicines());
+    response.setConfidenceScore(image.getConfidenceScore());
+    response.setAnalyzedAt(image.getAnalyzedAt());
+    
+    return ResponseEntity.ok(ApiResponse.success("Prescription image retrieved", response));
+}
     
     @GetMapping("/images/{imageId}/analysis")
-    @Operation(summary = "Get AI analysis report")
-    public ResponseEntity<ApiResponse<PrescriptionAnalysisResponse>> getAnalysis(@PathVariable Long imageId) {
-        PrescriptionImage image = prescriptionAnalysisRepositoryBean.getPrescriptionImageById(imageId);
-        
-        if (!"COMPLETED".equals(image.getAnalysisStatus())) {
-            return ResponseEntity.ok(ApiResponse.error("Analysis not completed yet"));
-        }
-        
+@Operation(summary = "Get AI analysis report")
+public ResponseEntity<ApiResponse<PrescriptionAnalysisResponse>> getAnalysis(@PathVariable Long imageId) {
+    PrescriptionImage image = prescriptionAnalysisRepositoryBean.getPrescriptionImageById(imageId);
+    
+    if (!"COMPLETED".equals(image.getAnalysisStatus())) {
         PrescriptionAnalysisResponse response = new PrescriptionAnalysisResponse();
         response.setImageId(image.getId());
         response.setStatus(image.getAnalysisStatus());
-        response.setExtractedText(image.getExtractedText());
-        response.setConfidenceScore(image.getConfidenceScore());
-        response.setAnalyzedAt(image.getAnalyzedAt());
         
-        return ResponseEntity.ok(ApiResponse.success("Analysis report retrieved", response));
+        return ResponseEntity.ok(
+            ApiResponse.error("Analysis not completed yet. Status: " + image.getAnalysisStatus())
+        );
     }
     
-    @PostMapping("/images/{imageId}/reanalyze")
-    @Operation(summary = "Trigger re-analysis")
-    public ResponseEntity<ApiResponse<Void>> reanalyze(@PathVariable Long imageId) {
-        prescriptionAnalysisRepositoryBean.analyzeImageAsync(imageId);
-        return ResponseEntity.ok(ApiResponse.success("Re-analysis triggered", null));
-    }
+    PrescriptionAnalysisResponse response = new PrescriptionAnalysisResponse();
+    response.setImageId(image.getId());
+    response.setStatus(image.getAnalysisStatus());
+    response.setExtractedText(image.getExtractedText());
+    response.setAnalyzedMedicines(image.getAnalyzedMedicines());
+    response.setConfidenceScore(image.getConfidenceScore());
+    response.setAnalyzedAt(image.getAnalyzedAt());
+    
+    return ResponseEntity.ok(ApiResponse.success("Analysis report retrieved", response));
+}
     
     @PostMapping("/images/{imageId}/ask")
     @Operation(summary = "Ask question about prescription")
@@ -132,23 +141,25 @@ public class AIPrescriptionController {
     }
     
     @GetMapping("/patient/{patientId}/all-analyzed")
-    @Operation(summary = "Get all analyzed prescriptions for patient")
-    public ResponseEntity<ApiResponse<List<PrescriptionAnalysisResponse>>> getPatientAnalyzedPrescriptions(
-            @PathVariable Long patientId) {
-        
-        List<PrescriptionImage> images = prescriptionAnalysisRepositoryBean.getPatientAnalyzedPrescriptions(patientId);
-        
-        List<PrescriptionAnalysisResponse> responses = images.stream()
-            .map(img -> {
-                PrescriptionAnalysisResponse resp = new PrescriptionAnalysisResponse();
-                resp.setImageId(img.getId());
-                resp.setStatus(img.getAnalysisStatus());
-                resp.setConfidenceScore(img.getConfidenceScore());
-                resp.setAnalyzedAt(img.getAnalyzedAt());
-                return resp;
-            })
-            .collect(Collectors.toList());
-        
-        return ResponseEntity.ok(ApiResponse.success("Patient prescriptions retrieved", responses));
-    }
+@Operation(summary = "Get all analyzed prescriptions for patient")
+public ResponseEntity<ApiResponse<List<PrescriptionAnalysisResponse>>> getPatientAnalyzedPrescriptions(
+        @PathVariable Long patientId) {
+    
+    List<PrescriptionImage> images = prescriptionAnalysisRepositoryBean.getPatientAnalyzedPrescriptions(patientId);
+    
+    List<PrescriptionAnalysisResponse> responses = images.stream()
+        .map(img -> {
+            PrescriptionAnalysisResponse resp = new PrescriptionAnalysisResponse();
+            resp.setImageId(img.getId());
+            resp.setStatus(img.getAnalysisStatus());
+            resp.setExtractedText(img.getExtractedText());
+            resp.setAnalyzedMedicines(img.getAnalyzedMedicines());
+            resp.setConfidenceScore(img.getConfidenceScore());
+            resp.setAnalyzedAt(img.getAnalyzedAt());
+            return resp;
+        })
+        .collect(Collectors.toList());
+    
+    return ResponseEntity.ok(ApiResponse.success("Patient prescriptions retrieved", responses));
+}
 }

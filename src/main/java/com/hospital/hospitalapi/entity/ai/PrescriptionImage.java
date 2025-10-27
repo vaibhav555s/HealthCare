@@ -40,6 +40,9 @@ public class PrescriptionImage {
     @Column(columnDefinition = "TEXT")
     private String aiAnalysisReport;
     
+    @Column(columnDefinition = "TEXT")
+    private String analyzedMedicines;  // <-- NEW FIELD
+    
     @Column(nullable = false, length = 20)
     private String analysisStatus; // PENDING, ANALYZING, COMPLETED, FAILED
     
@@ -63,3 +66,4 @@ public class PrescriptionImage {
         updatedAt = LocalDateTime.now();
     }
 }
+

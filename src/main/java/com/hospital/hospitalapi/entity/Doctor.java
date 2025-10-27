@@ -42,20 +42,35 @@ public class Doctor {
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
     
-    @Column(nullable = false)
+    @Column(name = "experience_years", nullable = false)  // Changed to experience_years
     private Integer experienceYears;
     
-    @Column(nullable = false)
+    @Column(name = "consultation_fee", nullable = false)
     private Double consultationFee;
     
-    @Column(nullable = false)
+    @Column(name = "is_available", nullable = false)
     private Boolean isAvailable = true;
+    
+    @Column(name = "active", nullable = false)
+    private Boolean isActive = true;
     
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
     
     @Column(nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+        if (isAvailable == null) {
+            isAvailable = true;
+        }
+        if (isActive == null) {
+            isActive = true;
+        }
+    }
     
     @PreUpdate
     protected void onUpdate() {

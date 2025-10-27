@@ -32,6 +32,7 @@ public class DoctorController {
     }
     
     @GetMapping
+    @Operation(summary = "Get all doctors")
     public ResponseEntity<ApiResponse<List<DoctorResponse>>> getAllDoctors() {
         List<DoctorResponse> doctors = doctorRepositoryBean.getAllDoctors()
             .stream().map(this::mapToResponse).collect(Collectors.toList());
@@ -39,12 +40,14 @@ public class DoctorController {
     }
     
     @GetMapping("/{id}")
+    @Operation(summary = "Get doctor by ID")
     public ResponseEntity<ApiResponse<DoctorResponse>> getDoctorById(@PathVariable Long id) {
         Doctor doctor = doctorRepositoryBean.getDoctorById(id);
         return ResponseEntity.ok(ApiResponse.success("Doctor retrieved", mapToResponse(doctor)));
     }
     
     @GetMapping("/department/{deptId}")
+    @Operation(summary = "Get doctors by department")
     public ResponseEntity<ApiResponse<List<DoctorResponse>>> getDoctorsByDepartment(@PathVariable Long deptId) {
         List<DoctorResponse> doctors = doctorRepositoryBean.getDoctorsByDepartment(deptId)
             .stream().map(this::mapToResponse).collect(Collectors.toList());
@@ -52,6 +55,7 @@ public class DoctorController {
     }
     
     @GetMapping("/specialization/{specialization}")
+    @Operation(summary = "Get doctors by specialization")
     public ResponseEntity<ApiResponse<List<DoctorResponse>>> getDoctorsBySpecialization(
             @PathVariable String specialization) {
         List<DoctorResponse> doctors = doctorRepositoryBean.getDoctorsBySpecialization(specialization)
@@ -59,7 +63,24 @@ public class DoctorController {
         return ResponseEntity.ok(ApiResponse.success("Doctors retrieved", doctors));
     }
     
+    @GetMapping("/active")
+    @Operation(summary = "Get all active doctors")
+    public ResponseEntity<ApiResponse<List<DoctorResponse>>> getActiveDoctors() {
+        List<DoctorResponse> doctors = doctorRepositoryBean.getActiveDoctors()
+            .stream().map(this::mapToResponse).collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.success("Active doctors retrieved", doctors));
+    }
+    
+    @GetMapping("/available")
+    @Operation(summary = "Get all available doctors")
+    public ResponseEntity<ApiResponse<List<DoctorResponse>>> getAvailableDoctors() {
+        List<DoctorResponse> doctors = doctorRepositoryBean.getAvailableDoctors()
+            .stream().map(this::mapToResponse).collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.success("Available doctors retrieved", doctors));
+    }
+    
     @PutMapping("/{id}")
+    @Operation(summary = "Update doctor")
     public ResponseEntity<ApiResponse<DoctorResponse>> updateDoctor(
             @PathVariable Long id, @RequestBody DoctorRequest request) {
         Doctor doctor = mapToEntity(request);
@@ -67,7 +88,30 @@ public class DoctorController {
         return ResponseEntity.ok(ApiResponse.success("Doctor updated", mapToResponse(updated)));
     }
     
+    @PatchMapping("/{id}/availability")
+    @Operation(summary = "Update doctor availability status")
+    public ResponseEntity<ApiResponse<DoctorResponse>> updateAvailability(
+            @PathVariable Long id, @RequestParam Boolean isAvailable) {
+        Doctor updated = doctorRepositoryBean.updateAvailability(id, isAvailable);
+        return ResponseEntity.ok(ApiResponse.success("Doctor availability updated", mapToResponse(updated)));
+    }
+    
+    @PatchMapping("/{id}/activate")
+    @Operation(summary = "Activate doctor")
+    public ResponseEntity<ApiResponse<DoctorResponse>> activateDoctor(@PathVariable Long id) {
+        Doctor updated = doctorRepositoryBean.updateActiveStatus(id, true);
+        return ResponseEntity.ok(ApiResponse.success("Doctor activated", mapToResponse(updated)));
+    }
+    
+    @PatchMapping("/{id}/deactivate")
+    @Operation(summary = "Deactivate doctor (soft delete)")
+    public ResponseEntity<ApiResponse<DoctorResponse>> deactivateDoctor(@PathVariable Long id) {
+        Doctor updated = doctorRepositoryBean.updateActiveStatus(id, false);
+        return ResponseEntity.ok(ApiResponse.success("Doctor deactivated", mapToResponse(updated)));
+    }
+    
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete doctor permanently")
     public ResponseEntity<ApiResponse<Void>> deleteDoctor(@PathVariable Long id) {
         doctorRepositoryBean.deleteDoctor(id);
         return ResponseEntity.ok(ApiResponse.success("Doctor deleted", null));
@@ -84,6 +128,14 @@ public class DoctorController {
         doctor.setEmail(request.getEmail());
         doctor.setExperienceYears(request.getExperienceYears());
         doctor.setConsultationFee(request.getConsultationFee());
+        
+        if (request.getIsAvailable() != null) {
+            doctor.setIsAvailable(request.getIsAvailable());
+        }
+        if (request.getIsActive() != null) {
+            doctor.setIsActive(request.getIsActive());
+        }
+        
         return doctor;
     }
     
@@ -101,7 +153,9 @@ public class DoctorController {
         response.setExperienceYears(doctor.getExperienceYears());
         response.setConsultationFee(doctor.getConsultationFee());
         response.setIsAvailable(doctor.getIsAvailable());
+        response.setIsActive(doctor.getIsActive());
         response.setCreatedAt(doctor.getCreatedAt());
+        response.setUpdatedAt(doctor.getUpdatedAt());
         return response;
     }
 }

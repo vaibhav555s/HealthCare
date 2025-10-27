@@ -14,4 +14,6 @@ public class DoctorRequest {
     private Long departmentId;
     private Integer experienceYears;
     private Double consultationFee;
+    private Boolean isAvailable;
+    private Boolean isActive;
 }

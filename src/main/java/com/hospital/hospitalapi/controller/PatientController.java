@@ -87,21 +87,22 @@ public class PatientController {
     }
     
     private PatientResponse mapToResponse(Patient patient) {
-        PatientResponse response = new PatientResponse();
-        response.setId(patient.getId());
-        response.setFirstName(patient.getFirstName());
-        response.setLastName(patient.getLastName());
-        response.setDateOfBirth(patient.getDateOfBirth());
-        response.setGender(patient.getGender());
-        response.setContactNumber(patient.getContactNumber());
-        response.setEmail(patient.getEmail());
-        response.setAddress(patient.getAddress());
-        response.setBloodGroup(patient.getBloodGroup());
-        response.setAllergies(patient.getAllergies());
-        response.setEmergencyContactName(patient.getEmergencyContactName());
-        response.setEmergencyContactNumber(patient.getEmergencyContactNumber());
-        response.setCreatedAt(patient.getCreatedAt());
-        response.setUpdatedAt(patient.getUpdatedAt());
-        return response;
-    }
+    PatientResponse response = new PatientResponse();
+    response.setId(patient.getId());
+    response.setFirstName(patient.getFirstName());
+    response.setLastName(patient.getLastName());
+    response.setDateOfBirth(patient.getDateOfBirth());
+    response.setAge(patient.getAge());  // Add this line
+    response.setGender(patient.getGender());
+    response.setContactNumber(patient.getContactNumber());
+    response.setEmail(patient.getEmail());
+    response.setAddress(patient.getAddress());
+    response.setBloodGroup(patient.getBloodGroup());
+    response.setAllergies(patient.getAllergies());
+    response.setEmergencyContactName(patient.getEmergencyContactName());
+    response.setEmergencyContactNumber(patient.getEmergencyContactNumber());
+    response.setCreatedAt(patient.getCreatedAt());
+    response.setUpdatedAt(patient.getUpdatedAt());
+    return response;
+}
 }

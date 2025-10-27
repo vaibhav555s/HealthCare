@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 
 @Entity
 @Table(name = "patients")
@@ -26,6 +27,9 @@ public class Patient {
     
     @Column(nullable = false)
     private LocalDate dateOfBirth;
+    
+    @Column(nullable = false)
+    private Integer age;
     
     @Column(nullable = false, length = 10)
     private String gender;
@@ -57,8 +61,28 @@ public class Patient {
     @Column(nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
     
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+        calculateAge();
+    }
+    
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+        calculateAge();
+    }
+    
+    private void calculateAge() {
+        if (this.dateOfBirth != null) {
+            this.age = Period.between(this.dateOfBirth, LocalDate.now()).getYears();
+        }
+    }
+    
+    // Override setter to auto-calculate age when DOB is set
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+        calculateAge();
     }
 }

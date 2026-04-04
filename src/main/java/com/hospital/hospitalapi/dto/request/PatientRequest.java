@@ -16,4 +16,5 @@ public class PatientRequest {
     private String allergies;
     private String emergencyContactName;
     private String emergencyContactNumber;
+    private String password;
 }

@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +17,7 @@ import java.util.List;
 public class PatientRepositoryBean {
     
     private final PatientRepository patientRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
     
     @Transactional
     public Patient createPatient(Patient patient) {
@@ -31,6 +33,9 @@ public class PatientRepositoryBean {
             throw new DuplicateResourceException("Email already exists");
         }
         
+        if (patient.getPassword() != null && !patient.getPassword().isBlank()) {
+            patient.setPassword(passwordEncoder.encode(patient.getPassword()));
+        }
         Patient saved = patientRepository.save(patient);
         log.info("Patient created successfully with ID: {}", saved.getId());
         return saved;
@@ -63,6 +68,9 @@ public class PatientRepositoryBean {
         patient.setAllergies(patientDetails.getAllergies());
         patient.setEmergencyContactName(patientDetails.getEmergencyContactName());
         patient.setEmergencyContactNumber(patientDetails.getEmergencyContactNumber());
+        if (patientDetails.getPassword() != null && !patientDetails.getPassword().isBlank()) {
+            patient.setPassword(passwordEncoder.encode(patientDetails.getPassword()));
+        }
         
         Patient updated = patientRepository.save(patient);
         log.info("Patient updated successfully: {}", id);

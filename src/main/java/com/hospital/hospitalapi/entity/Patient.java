@@ -1,6 +1,7 @@
 package com.hospital.hospitalapi.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,6 +40,10 @@ public class Patient {
     
     @Column(unique = true, length = 100)
     private String email;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(length = 200)
+    private String password;
     
     @Column(columnDefinition = "TEXT")
     private String address;

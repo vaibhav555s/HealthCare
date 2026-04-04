@@ -83,6 +83,7 @@ public class PatientController {
         patient.setAllergies(request.getAllergies());
         patient.setEmergencyContactName(request.getEmergencyContactName());
         patient.setEmergencyContactNumber(request.getEmergencyContactNumber());
+        patient.setPassword(request.getPassword());
         return patient;
     }
     

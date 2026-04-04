@@ -63,7 +63,7 @@ public class GeminiIntegrationRepositoryBean {
             inlineDataPart.put("inline_data", Map.of("mime_type", mimeType, "data", imageB64));
 
             Map<String,Object> textPart = new HashMap<>();
-            String prompt = "Analyze this prescription image and extract medicine names, dosages, frequency, duration, and any special instructions. Format the response as JSON.";
+            String prompt = "Analyze this prescription image and extract medicine names, dosages, frequency, duration. Give description about what the medicine is and why am i taking it and how does it cure my specified issue.";
             textPart.put("text", prompt);
 
             List<Object> parts = new ArrayList<>();

@@ -37,7 +37,7 @@ public class Appointment {
     @Column(nullable = false)
     private LocalTime appointmentTime;
     
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(nullable = false, unique = true, length = 50)
     private String tokenNumber;
     
     @Column(nullable = false, length = 20)
@@ -48,6 +48,23 @@ public class Appointment {
     
     @Column(columnDefinition = "TEXT")
     private String notes;
+    
+    // Consultation summary (filled when doctor completes)
+    @Column(columnDefinition = "TEXT")
+    private String diagnosis;
+    
+    @Column(columnDefinition = "TEXT")
+    private String medicines;
+    
+    @Column(columnDefinition = "TEXT")
+    private String consultationNotes;
+    
+    // Patient feedback
+    @Column
+    private Integer rating;  // 1-5 stars
+    
+    @Column(columnDefinition = "TEXT")
+    private String feedbackComment;
     
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

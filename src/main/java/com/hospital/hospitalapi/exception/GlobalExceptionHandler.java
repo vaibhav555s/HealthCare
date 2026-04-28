@@ -109,11 +109,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ApiResponse.error(ex.getMessage()));
     }
+
+    // Handle RuntimeException with actual message instead of generic error
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex) {
+        log.error("Runtime error: {}", ex.getMessage());
+        String message = ex.getMessage();
+        if (message == null || message.isBlank()) {
+            message = "An unexpected error occurred. Please try again.";
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ApiResponse.error(message));
+    }
     
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGenericException(Exception ex) {
         log.error("Unexpected error: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ApiResponse.error("An unexpected error occurred"));
+            .body(ApiResponse.error("An unexpected error occurred. Please try again later."));
     }
 }

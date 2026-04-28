@@ -38,6 +38,10 @@ public class Doctor {
     @Column(length = 100)
     private String email;
     
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
+    @Column(length = 200)
+    private String password;
+    
     @ManyToOne
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;

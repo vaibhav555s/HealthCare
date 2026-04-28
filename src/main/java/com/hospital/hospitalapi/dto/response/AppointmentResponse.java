@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 @Data
 public class AppointmentResponse {
     private Long id;
+    private Long patientId;
+    private Long doctorId;
     private String patientName;
     private String doctorName;
     private String departmentName;
@@ -18,4 +20,13 @@ public class AppointmentResponse {
     private String reason;
     private String notes;
     private LocalDateTime createdAt;
+    
+    // Consultation data (filled after doctor completes)
+    private String diagnosis;
+    private String medicines;
+    private String consultationNotes;
+    
+    // Patient feedback
+    private Integer rating;
+    private String feedbackComment;
 }
